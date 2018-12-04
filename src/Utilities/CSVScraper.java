@@ -1,5 +1,7 @@
 package Utilities;
 
+import Values.WorkoutData;
+
 import java.io.*;
 
 public class CSVScraper {
@@ -16,20 +18,27 @@ public class CSVScraper {
     private Double Smoothness;
     private int Reps;
     private String Hand;
-    private String fileName="";
+    private String fileName = "";
+    private boolean sensor = false;
 
     /**
      * @return cvs starting with data if no more lines returns null.
      */
-    public CSV_Line_Dissect readLine() {
-        CSV_Line_Dissect csv_line_dissect;
+    public CSV_Line_Dissect_Abstract readLine() {
+
+        CSV_Line_Dissect_Abstract csv_line_dissect_abstract;
+
+        if (sensor) {
+            csv_line_dissect_abstract = new CSV_Line_Dissect_Sensor();
+        } else {
+            csv_line_dissect_abstract = new CSV_Line_Dissect_Touch();
+        }
         String line;
         try {
             if ((line = br.readLine()) != null) {
-          //      System.out.println(line);
                 if (line.split(cvsSplitBy).length > 0) {
-                    csv_line_dissect = new CSV_Line_Dissect(line.split(cvsSplitBy));
-                    return csv_line_dissect;
+                    csv_line_dissect_abstract.dataIn(line.split(cvsSplitBy));
+                    return csv_line_dissect_abstract;
                 }
             } else {
                 br.close();
@@ -44,8 +53,8 @@ public class CSVScraper {
     public boolean validateFile(String filePath) {
         try {
             File file = new File(filePath);
-            fileName=file.getName();
-            file=null;
+            fileName = file.getName();
+            file = null;
             br = new BufferedReader(new FileReader(filePath));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -54,16 +63,19 @@ public class CSVScraper {
         lineCount = 0;
         try {
             line = br.readLine();
-            if(line==null){return false;}
+            if (line == null) {
+                return false;
+            }
             titleBar = line.split(cvsSplitBy).clone();
         } catch (IOException e) {
             e.printStackTrace();
+
         }
-      //  System.out.println(line);
+        //  System.out.println(line);
         return (line != null && !line.equals("") && line.charAt(0) != '{');
     }
 
-    public void loadHeaderCSV() {
+    public boolean loadHeaderCSV() {
         String[] values;
         try {
             values = line.split(cvsSplitBy);
@@ -88,12 +100,24 @@ public class CSVScraper {
             }
             line = br.readLine();
         } catch (IOException e) {
-            e.printStackTrace();
-        }
 
+            e.printStackTrace();
+            return false;
+        }
+        if (WorkoutName != null) {
+            for (String str : WorkoutData.SensorNames) {
+                if (str.equals(WorkoutName)) {
+                    sensor = true;
+                }
+            }
+        }
+        return true;
 
     }
 
+    public boolean getSensor() {
+        return sensor;
+    }
 
     public Double getDuration() {
         return Duration;

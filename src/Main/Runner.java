@@ -4,6 +4,7 @@ import Activity.SensorActivityToJerk;
 import Data_Models.DataPoint;
 import Data_Out.GenerateDataPoint;
 import Data_Models.Program;
+import Data_Out.ProgramToCSV;
 import Values.FileLocationConstants;
 import Values.WorkoutData;
 
@@ -17,8 +18,8 @@ public class Runner {
     static HashMap<String, Integer> completedActivityCount = new HashMap<>();
     static int good_Count = 0;
     static int total_Count = 0;
-    static Program[] studies = new Program[]{new Program("Baseline",0), new Program("Full",1), new Program("Final",2)};
-    public static GenerateDataPoint generateDataPoint = new GenerateDataPoint();
+    static Program[] studies = new Program[]{new Program("Baseline", 0), new Program("Full", 1), new Program("Final", 2)};
+    static Integer[] countNum = new Integer[]{0, 0, 0};
 
     public static void main(String[] args) {
         ArrayList<File> files = getAllLocalFiles();
@@ -28,18 +29,10 @@ public class Runner {
                 for (String str : WorkoutData.ValidNames) {
                     if (sensorActivityToJerk.getCsvScraper().getWorkoutName().contains(str)) {
                         sensorActivityToJerk.RunCSV();
-                        calculateError(sensorActivityToJerk);
                         filterBySession(sensorActivityToJerk);
-                        sortData();
-                        createCSV();
-                        break;
                     }
                 }
-                // System.out.println("Valid");
-            } else {
-                //  System.out.println("Not Valid!");
             }
-
         }
         for (HashMap.Entry<String, Double> entry : errorSum.entrySet()) {
             System.out.println("Results: " + entry.getKey() + ": " + (entry.getValue() / (double) completedActivityCount.get(entry.getKey())) + "%");
@@ -49,6 +42,9 @@ public class Runner {
         System.out.println("Good: [" + good_Count + "]");
         System.out.println("Total:[" + total_Count + "]");
         System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~");
+        sortData();
+        createCSV();
+
     }
 
     /**
@@ -68,7 +64,6 @@ public class Runner {
         if (sensorActivityToJerk.getCsvScraper().getReps() == sensorActivityToJerk.get_CurrentWorkout().getProgress()) {
 
         } else {
-            System.out.println(sensorActivityToJerk.getCsvScraper().getReps() + " vs. " + sensorActivityToJerk.get_CurrentWorkout().getProgress());
 
         }
         total_Count++;
@@ -83,6 +78,8 @@ public class Runner {
 
     public static void filterBySession(SensorActivityToJerk sensorActivityToJerk) {
         String activityName = sensorActivityToJerk.getCsvScraper().getFileName();
+        GenerateDataPoint generateDataPoint = new GenerateDataPoint();
+
         int sessionNumber = -1;
         if (activityName.toLowerCase().contains("baseline")) {
             sessionNumber = 0;
@@ -91,20 +88,36 @@ public class Runner {
         } else if (activityName.toLowerCase().contains("final")) {
             sessionNumber = 2;
         }
-        if (sessionNumber != -1 && (activityName.charAt(0) == 's' || activityName.split("_")[1].charAt(0) == 's')) {
+
+        boolean validName = false;
+        if (sessionNumber == 1) {
+            generateDataPoint.setSpecialNamingCaseUnset(true);
+            validName = (((activityName.charAt(0) == 's' || activityName.split("_")[1].charAt(0) == 's') || (activityName.charAt(0) == '_')));
+        }
+        if (validName) {
+            countNum[sessionNumber]++;
             generateDataPoint.infoIn(sensorActivityToJerk, sessionNumber);
             DataPoint dataPoint = generateDataPoint.getDataPoint();
             studies[sessionNumber].dataPointIn(dataPoint);
+            good_Count++;
+        } else {
+            System.out.println("Not a valid name " + activityName);
         }
+
+
     }
 
-    public static void sortData(){
-        for(int i =0; i< studies.length;i++){
+    public static void sortData() {
+        for (int i = 0; i < studies.length; i++) {
             studies[i].sortAllPeople();
         }
+
     }
 
-    public static void createCSV(){
 
+    public static void createCSV() {
+        System.out.println("Generating CSV");
+        new ProgramToCSV("Full.csv", studies[1]);
+        System.out.println("Run Done!");
     }
 }

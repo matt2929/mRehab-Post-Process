@@ -1,5 +1,7 @@
 package Data_Models;
 
+import java.util.ArrayList;
+
 public class DataPoint {
     int participantNumber = -1;
     int hand = -1;
@@ -8,10 +10,10 @@ public class DataPoint {
     int exerciseDay = -1;
     int exerciseSession = -1;
     int activity = -1;
-    long[] repDuration;
-    double[] repSmoothness;
+    ArrayList<Long> repDuration;
+    ArrayList<Float> repSmoothness;
 
-    public DataPoint(int participantNumber, int hand, Long time, int program, int exerciseDay, int exerciseSession, int activity, long[] repDuration, double[] repSmoothness) {
+    public DataPoint(int participantNumber, int hand, Long time, int program, int exerciseDay, int exerciseSession, int activity, ArrayList<Long> repDuration, ArrayList<Float> repSmoothness) {
         this.participantNumber = participantNumber;
         this.hand = hand;
         this.time = time;
@@ -50,11 +52,11 @@ public class DataPoint {
     }
 
 
-    public void setRepSmoothness(double[] repSmoothness) {
+    public void setRepSmoothness(ArrayList<Float> repSmoothness) {
         this.repSmoothness = repSmoothness;
     }
 
-    public void setRepDuration(long[] repDuration) {
+    public void setRepDuration(ArrayList<Long> repDuration) {
         this.repDuration = repDuration;
     }
 
@@ -62,7 +64,7 @@ public class DataPoint {
         this.time = time;
     }
 
-    public double[] getRepSmoothness() {
+    public ArrayList<Float> getRepSmoothness() {
         return repSmoothness;
     }
 
@@ -94,7 +96,7 @@ public class DataPoint {
         return time;
     }
 
-    public long[] getRepDuration() {
+    public ArrayList<Long> getRepDuration() {
         return repDuration;
     }
 

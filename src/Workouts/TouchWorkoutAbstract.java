@@ -13,7 +13,7 @@ public class TouchWorkoutAbstract extends WorkoutAbstract {
 
 	}
 
-	public boolean TouchIn(float x, float y) {
+	public boolean TouchIn(long time, float x, float y) {
 		return false;
 	}
 

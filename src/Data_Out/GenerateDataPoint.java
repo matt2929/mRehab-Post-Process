@@ -8,17 +8,17 @@ import java.util.HashMap;
 public class GenerateDataPoint {
     DataPoint dataPoint;
     HashMap<String, Integer> workoutStringToInteger = new HashMap<>();
+    private boolean specialNamingCaseUnset = false;
 
     public DataPoint infoIn(SensorActivityToJerk saj, int session) {
         dataPoint= new DataPoint();
-        dataPoint = new DataPoint();
         dataPoint.setHand(getHand(saj));
         dataPoint.setActivity(getActivity(saj));
         dataPoint.setExerciseSession(session);
         dataPoint.setParticipantNumber(getParticipantNumber(session, saj));
         dataPoint.setProgram(session);
-        dataPoint.setRepSmoothness(saj.get_CurrentWorkout().getScores());
-        dataPoint.setRepDuration(saj.get_CurrentWorkout().getTimes());
+        dataPoint.setRepSmoothness(saj.get_CurrentWorkout().getScore().getScore());
+        dataPoint.setRepDuration(saj.get_CurrentWorkout().getScore().getTimes());
         dataPoint.setTime(saj.getCsvScraper().getDate());
         return dataPoint;
     }
@@ -37,27 +37,43 @@ public class GenerateDataPoint {
     }
 
     private int getActivity(SensorActivityToJerk saj) {
-        switch (saj.getCsvScraper().getWorkoutName()) {
-            case ("Horizontal Bowl"):
-                return 0;
-            case ("Horizontal Mug"):
-                return 1;
-            case ("Vertical Bowl"):
-                return 2;
+        if(saj.getCsvScraper().getWorkoutName().equals("Slow Pour")){
+            return 0;
+        }else if(saj.getCsvScraper().getWorkoutName().equals("Horizontal Bowl")){
+            return 1;
+        }else if(saj.getCsvScraper().getWorkoutName().equals("Horizontal Mug")){
+            return 2;
+        }else if(saj.getCsvScraper().getWorkoutName().equals("Vertical Bowl")){
+            return 3;
+        }else if(saj.getCsvScraper().getWorkoutName().equals("Vertical Mug")){
+            return 4;
+        }else if(saj.getCsvScraper().getWorkoutName().equals("Sip From The Mug")) {
+            return 5;
+        }else if(saj.getCsvScraper().getWorkoutName().equals("Quick Twist Mug")) {
+            return 6;
+        }else if(saj.getCsvScraper().getWorkoutName().equals("Sip From The Mug")) {
+            return 7;
+        }else if(saj.getCsvScraper().getWorkoutName().equals("Slow Pour")) {
+            return 8;
+        }else if(saj.getCsvScraper().getWorkoutName().equals("Sip From The Mug")) {
+            return 9;
+        }else if(saj.getCsvScraper().getWorkoutName().equals("Walk with mug")) {
+            return 10;
 
-            case ("Vertical Mug"):
-                return 3;
-            case ("Slow Pour"):
-                return 4;
-            case ("Sip From The Mug"):
-                return 5;
-        }
+
+
+    }
         return -1;
     }
-
+    public void setSpecialNamingCaseUnset(boolean specialNamingCaseUnset){
+        this.specialNamingCaseUnset=specialNamingCaseUnset;
+    }
     private int getParticipantNumber(int session, SensorActivityToJerk saj) {
-        System.out.println("session: "+ session+" full "+ saj.getCsvScraper().getFileName());
-
+        if(specialNamingCaseUnset){
+            if(saj.getCsvScraper().getFileName().charAt(0)=='_'){
+                return 4;
+            }
+        }
         if (session == 0) {
             String first = saj.getCsvScraper().getFileName().split("_")[0];
             String subName = first.substring(1, 3);
@@ -79,5 +95,7 @@ public class GenerateDataPoint {
             return -1;
         }
     }
+
+
 
 }

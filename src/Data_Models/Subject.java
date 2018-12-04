@@ -18,9 +18,9 @@ public class Subject {
             Collections.sort(entry.getValue(), new Comparator<DataPoint>() {
                 @Override
                 public int compare(DataPoint o1, DataPoint o2) {
-                    if ((o1.time - o2.time) > 0l) {
+                    if ((o1.getTime() - o2.getTime()) > 0l) {
                         return 1;
-                    } else if ((o1.time - o2.time) < 0l) {
+                    } else if ((o1.getTime() - o2.getTime()) < 0l) {
                         return -1;
                     } else {
                         return 0;

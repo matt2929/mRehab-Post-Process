@@ -38,6 +38,8 @@ public final class WorkoutData {
 	public static String UserName = "";
 	public static Float progressLocal = 0f;
 	public static Float progressCloud = 0f;
-	public static final String[] ValidNames = new String[]{"Horizontal Bowl", "Horizontal Mug", "Vertical Bowl", "Vertical Mug", "Slow Pour", "Sip From The Mug"};
+	public static final String[] ValidNames = new String[]{"Horizontal Bowl", "Horizontal Mug", "Vertical Bowl", "Vertical Mug", "Sip From The Mug","Quick Twist Mug","Slow Pour","Walk with mug"};
+	public static final String[] SensorNames = new String[]{"Horizontal Bowl", "Horizontal Mug", "Vertical Bowl", "Vertical Mug", "Sip From The Mug","Quick Twist Mug","Slow Pour","Walk with mug"};
+	public static final String[] TouchNames = new String[]{"Unlock With Key","Turn Doorknob"};
 
 }

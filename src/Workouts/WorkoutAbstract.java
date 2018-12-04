@@ -47,12 +47,6 @@ public abstract class WorkoutAbstract {
 		return reps;
 	}
 
-	public long[] getTimes(){
-		return new long[1];
-	}
 
-	public double[] getScores(){
-		return new double[1];
-	}
 
 }
