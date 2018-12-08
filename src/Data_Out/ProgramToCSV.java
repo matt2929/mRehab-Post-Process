@@ -1,10 +1,15 @@
 package Data_Out;
 
 import Data_Models.*;
+import Utilities.WorkoutNumberConversion;
 import com.opencsv.*;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,10 +19,27 @@ import java.util.Map;
 public class ProgramToCSV {
     CSVWriter csvWriter = null;
     LegendWriter legendWriter;
+    DataFilter dataFilter;
 
-    public ProgramToCSV(String filename, Program program) {
+    public ProgramToCSV(String filename, Program program, DataFilter dataFilter) {
+
+        try {
+            File file = new File(filename.split("/")[0]);
+            if(file.exists()){
+                file.delete();
+            }
+            file.mkdir();
+            file = new File(filename);
+            if(file.exists()){
+                file.delete();
+            }
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         openFile(filename);
         generateTitle();
+        this.dataFilter = dataFilter;
         writeToFile(program, new LegendWriter(generateLegend()));
         closeFile();
 
@@ -32,7 +54,19 @@ public class ProgramToCSV {
     }
 
     public void generateTitle() {
-        String[] out = new String[]{"Participant #", "Hand", "Date", "Program", "Exercise Day", "Exercise Session", "Activity", "Rep Number", "Rep Smoothness", "Rep Duration", "Date MS", "Date Long"};
+        String[] out = new String[]{
+                "Participant #",
+                "Hand",
+                "Date",
+                "Program",
+                "Exercise Day",
+                "Exercise Week",
+                "Activity",
+                "Rep Number",
+                "Rep Smoothness",
+                "Rep Duration",
+                "Date MS",
+                "Date Long"};
         csvWriter.writeNext(out);
     }
 
@@ -41,18 +75,13 @@ public class ProgramToCSV {
         Legend hand = new Legend("Hand");
         hand.addPoint("0", "Left");
         hand.addPoint("1", "Right");
+
         Legend user = new Legend("Activity");
-        user.addPoint("0", "Slow Pour");
-        user.addPoint("1", "Horizontal Bowl");
-        user.addPoint("2", "Horizontal Mug");
-        user.addPoint("3", "Vertical Bowl");
-        user.addPoint("4", "Vertical Mug");
-        user.addPoint("5", "Sip From The Mug");
-        user.addPoint("6", "Quick Twist Mug");
-        user.addPoint("7", "Sip From The Mug");
-        user.addPoint("8", "Slow Pour");
-        user.addPoint("9", "Sip From The Mug");
-        user.addPoint("10", "Walk with mug");
+        WorkoutNumberConversion workoutNumberConversion = new WorkoutNumberConversion();
+        for(String str: workoutNumberConversion.getWorkouts()){
+            user.addPoint(""+workoutNumberConversion.nameToInt(str),str);
+        }
+
         Legend activity = new Legend("Subject");
         activity.addPoint("1", "s01");
         activity.addPoint("2", "s02");
@@ -71,28 +100,30 @@ public class ProgramToCSV {
                 for (DataPoint dp : workouts.getValue()) {
                     long addation = 0;
                     for (int dataPointIndex = 0; dataPointIndex < dp.getRepDuration().size(); dataPointIndex++) {
-                        long time = dp.getTime();
-                        time += addation;
-                        addation = dp.getRepDuration().get(dataPointIndex);
-                        String[] out = new String[16];
-                        out[0] = "" + dp.getParticipantNumber();
-                        out[1] = "" + dp.getHand();
-                        out[2] = "" + time;
-                        out[3] = "" + program.getProgramNumberKey();
-                        out[4] = "" + 0;
-                        out[5] = "" + 0;
-                        out[6] = "" + dp.getActivity();
-                        out[7] = "" + dataPointIndex;
-                        out[8] = "" + dp.getRepSmoothness().get(dataPointIndex);
-                        out[9] = "" + dp.getRepDuration().get(dataPointIndex);
-                        out[10] = new SimpleDateFormat("yyyy-MMM-dd HH:MM:SS").format(new Date(time));
-                        out[11] = "" + time;
-                        if (lw.hasNext()) {
-                            String[] next = lw.next();
-                            out[13] = next[0];
-                            out[14] = next[1];
+                        if (dataFilter.Filter(dp)) {
+                            long time = dp.getTime();
+                            time += addation;
+                            addation = dp.getRepDuration().get(dataPointIndex);
+                            String[] out = new String[16];
+                            out[0] = "" + dp.getParticipantNumber();
+                            out[1] = "" + dp.getHand();
+                            out[2] = "" + time;
+                            out[3] = "" + program.getProgramNumberKey();
+                            out[4] = "" + dp.getExerciseDay();
+                            out[5] = "" + dp.getExerciseWeek();
+                            out[6] = "" + dp.getActivity();
+                            out[7] = "" + dataPointIndex;
+                            out[8] = "" + dp.getRepSmoothness().get(dataPointIndex);
+                            out[9] = "" + dp.getRepDuration().get(dataPointIndex);
+                            out[10] = new SimpleDateFormat("yyyy-MMM-dd HH:MM:SS").format(new Date(time));
+                            out[11] = "" + time;
+                            if (lw.hasNext()) {
+                                String[] next = lw.next();
+                                out[13] = next[0];
+                                out[14] = next[1];
+                            }
+                            csvWriter.writeNext(out);
                         }
-                        csvWriter.writeNext(out);
                     }
                 }
             }

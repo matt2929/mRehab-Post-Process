@@ -8,18 +8,18 @@ public class DataPoint {
     Long time = -1l;
     int program = -1;
     int exerciseDay = -1;
-    int exerciseSession = -1;
+    int exerciseWeek = -1;
     int activity = -1;
     ArrayList<Long> repDuration;
     ArrayList<Float> repSmoothness;
 
-    public DataPoint(int participantNumber, int hand, Long time, int program, int exerciseDay, int exerciseSession, int activity, ArrayList<Long> repDuration, ArrayList<Float> repSmoothness) {
+    public DataPoint(int participantNumber, int hand, Long time, int program, int exerciseDay, int exerciseWeek, int activity, ArrayList<Long> repDuration, ArrayList<Float> repSmoothness) {
         this.participantNumber = participantNumber;
         this.hand = hand;
         this.time = time;
         this.program = program;
         this.exerciseDay = exerciseDay;
-        this.exerciseSession = exerciseSession;
+        this.exerciseWeek = exerciseWeek;
         this.activity = activity;
         this.repDuration = repDuration;
         this.repSmoothness = repSmoothness;
@@ -35,8 +35,8 @@ public class DataPoint {
         this.exerciseDay = exerciseDay;
     }
 
-    public void setExerciseSession(int exerciseSession) {
-        this.exerciseSession = exerciseSession;
+    public void setExerciseWeek(int exerciseWeek) {
+        this.exerciseWeek = exerciseWeek;
     }
 
     public void setHand(int hand) {
@@ -50,6 +50,7 @@ public class DataPoint {
     public void setProgram(int program) {
         this.program = program;
     }
+
 
 
     public void setRepSmoothness(ArrayList<Float> repSmoothness) {
@@ -76,8 +77,8 @@ public class DataPoint {
         return exerciseDay;
     }
 
-    public int getExerciseSession() {
-        return exerciseSession;
+    public int getExerciseWeek() {
+        return exerciseWeek;
     }
 
     public int getHand() {

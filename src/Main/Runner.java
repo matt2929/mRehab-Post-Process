@@ -2,16 +2,16 @@ package Main;
 
 import Activity.SensorActivityToJerk;
 import Data_Models.DataPoint;
+import Data_Out.DataFilter;
 import Data_Out.GenerateDataPoint;
 import Data_Models.Program;
 import Data_Out.ProgramToCSV;
+import Utilities.WorkoutNumberConversion;
 import Values.FileLocationConstants;
 import Values.WorkoutData;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 public class Runner {
     static HashMap<String, Double> errorSum = new HashMap<>();
@@ -20,16 +20,21 @@ public class Runner {
     static int total_Count = 0;
     static Program[] studies = new Program[]{new Program("Baseline", 0), new Program("Full", 1), new Program("Final", 2)};
     static Integer[] countNum = new Integer[]{0, 0, 0};
+    static Set<Integer> allWorkouts = new HashSet<>();
+    static Set<Integer> allSubjects = new HashSet<>();
+
 
     public static void main(String[] args) {
         ArrayList<File> files = getAllLocalFiles();
+        WorkoutNumberConversion workoutNumberConversion = new WorkoutNumberConversion();
         for (int i = 0; i < files.size(); i++) {
             SensorActivityToJerk sensorActivityToJerk = new SensorActivityToJerk();
             if (!files.get(i).isDirectory() && sensorActivityToJerk.LoadCSV(files.get(i))) {
-                for (String str : WorkoutData.ValidNames) {
-                    if (sensorActivityToJerk.getCsvScraper().getWorkoutName().contains(str)) {
+                for (String str : workoutNumberConversion.getWorkouts()) {
+                    if (sensorActivityToJerk.getCsvScraper().getWorkoutName().equals(str)) {
                         sensorActivityToJerk.RunCSV();
                         filterBySession(sensorActivityToJerk);
+                        break;
                     }
                 }
             }
@@ -56,26 +61,6 @@ public class Runner {
         return allFiles;
     }
 
-    public static double error(double expected, double actual) {
-        return (Math.abs(expected - actual) / expected) * 100;
-    }
-
-    public static void calculateError(SensorActivityToJerk sensorActivityToJerk) {
-        if (sensorActivityToJerk.getCsvScraper().getReps() == sensorActivityToJerk.get_CurrentWorkout().getProgress()) {
-
-        } else {
-
-        }
-        total_Count++;
-        if (!errorSum.containsKey(sensorActivityToJerk.getCsvScraper().getWorkoutName())) {
-            errorSum.put(sensorActivityToJerk.getCsvScraper().getWorkoutName(), error(sensorActivityToJerk.getCsvScraper().getReps(), sensorActivityToJerk.get_CurrentWorkout().getProgress()));
-            completedActivityCount.put(sensorActivityToJerk.getCsvScraper().getWorkoutName(), 1);
-        } else {
-            errorSum.put(sensorActivityToJerk.getCsvScraper().getWorkoutName(), errorSum.get(sensorActivityToJerk.getCsvScraper().getWorkoutName()) + error(sensorActivityToJerk.getCsvScraper().getReps(), sensorActivityToJerk.get_CurrentWorkout().getProgress()));
-            completedActivityCount.put(sensorActivityToJerk.getCsvScraper().getWorkoutName(), completedActivityCount.get(sensorActivityToJerk.getCsvScraper().getWorkoutName()) + 1);
-        }
-    }
-
     public static void filterBySession(SensorActivityToJerk sensorActivityToJerk) {
         String activityName = sensorActivityToJerk.getCsvScraper().getFileName();
         GenerateDataPoint generateDataPoint = new GenerateDataPoint();
@@ -88,17 +73,19 @@ public class Runner {
         } else if (activityName.toLowerCase().contains("final")) {
             sessionNumber = 2;
         }
-
         boolean validName = false;
         if (sessionNumber == 1) {
             generateDataPoint.setSpecialNamingCaseUnset(true);
             validName = (((activityName.charAt(0) == 's' || activityName.split("_")[1].charAt(0) == 's') || (activityName.charAt(0) == '_')));
+
         }
         if (validName) {
             countNum[sessionNumber]++;
             generateDataPoint.infoIn(sensorActivityToJerk, sessionNumber);
             DataPoint dataPoint = generateDataPoint.getDataPoint();
             studies[sessionNumber].dataPointIn(dataPoint);
+            allSubjects.add(dataPoint.getParticipantNumber());
+            allWorkouts.add(dataPoint.getActivity());
             good_Count++;
         } else {
             System.out.println("Not a valid name " + activityName);
@@ -117,7 +104,33 @@ public class Runner {
 
     public static void createCSV() {
         System.out.println("Generating CSV");
-        new ProgramToCSV("Full.csv", studies[1]);
-        System.out.println("Run Done!");
+        //Accept all Data
+        new ProgramToCSV("5_Pick_Ups_Total.csv", studies[1], new DataFilter() {
+            @Override
+            public boolean Filter(DataPoint dp) {
+                return true;
+            }
+        });
+        Iterator<Integer> iterator = allWorkouts.iterator();
+        while(iterator.hasNext()) {
+            int workoutNumber = iterator.next();
+            new ProgramToCSV("PerWorkout/Workout_"+workoutNumber+".csv", studies[1], new DataFilter() {
+                @Override
+                public boolean Filter(DataPoint dp) {
+                    return (dp.getActivity() == workoutNumber);
+                }
+            });
+        }
+        iterator = allSubjects.iterator();
+        while(iterator.hasNext()) {
+            int participantNumber = iterator.next();
+            new ProgramToCSV("PerSubject/Subject_"+participantNumber+".csv", studies[1], new DataFilter() {
+                @Override
+                public boolean Filter(DataPoint dp) {
+                    return (dp.getParticipantNumber() == participantNumber);
+                }
+            });
+        }
+
     }
 }
