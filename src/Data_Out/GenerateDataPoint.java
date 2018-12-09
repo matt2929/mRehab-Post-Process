@@ -1,5 +1,6 @@
 package Data_Out;
 
+import Activity.ActivityToJerkAbstract;
 import Activity.SensorActivityToJerk;
 import Data_Models.DataPoint;
 import Utilities.WorkoutNumberConversion;
@@ -11,7 +12,7 @@ public class GenerateDataPoint {
     HashMap<String, Integer> workoutStringToInteger = new HashMap<>();
     private boolean specialNamingCaseUnset = false;
 
-    public DataPoint infoIn(SensorActivityToJerk saj, int session) {
+    public DataPoint infoIn(ActivityToJerkAbstract saj, int session) {
         dataPoint = new DataPoint();
         dataPoint.setHand(getHand(saj));
         dataPoint.setActivity(getActivity(saj));
@@ -21,6 +22,7 @@ public class GenerateDataPoint {
         dataPoint.setRepSmoothness(saj.get_CurrentWorkout().getScore().getScore());
         dataPoint.setRepDuration(saj.get_CurrentWorkout().getScore().getTimes());
         dataPoint.setTime(saj.getCsvScraper().getDate());
+        System.out.println("workout "+ saj.getCsvScraper().getFileName()+" sensor: "+ saj.getCsvScraper().getSensor());
         return dataPoint;
     }
 
@@ -29,7 +31,7 @@ public class GenerateDataPoint {
         return dataPoint;
     }
 
-    private int getHand(SensorActivityToJerk saj) {
+    private int getHand(ActivityToJerkAbstract saj) {
         if (saj.getCsvScraper().getHand().equals("Left")) {
             return 0;
         } else {
@@ -37,7 +39,7 @@ public class GenerateDataPoint {
         }
     }
 
-    private int getActivity(SensorActivityToJerk saj) {
+    private int getActivity(ActivityToJerkAbstract saj) {
         WorkoutNumberConversion workoutNumberConversion = new WorkoutNumberConversion();
         return workoutNumberConversion.nameToInt(saj.getCsvScraper().getWorkoutName());
     }
@@ -46,7 +48,7 @@ public class GenerateDataPoint {
         this.specialNamingCaseUnset = specialNamingCaseUnset;
     }
 
-    private int getParticipantNumber(int session, SensorActivityToJerk saj) {
+    private int getParticipantNumber(int session, ActivityToJerkAbstract saj) {
         if (specialNamingCaseUnset) {
             if (saj.getCsvScraper().getFileName().charAt(0) == '_') {
                 return 4;
@@ -58,21 +60,17 @@ public class GenerateDataPoint {
             if (subName.charAt(0) == '0') {
                 subName = "" + subName.charAt(1);
             }
-            System.out.println("session: " + session + " full :" + saj.getCsvScraper().getFileName() + "first " + first + " sub " + subName);
             return Integer.parseInt(subName);
         } else if (session != -1) {
             String first = saj.getCsvScraper().getFileName().split("_")[0];
+            System.out.println("first: "+saj.getCsvScraper().getFileName());
             String subName = first.substring(1, 3);
             if (subName.charAt(0) == '0') {
                 subName = "" + subName.charAt(1);
             }
-            System.out.println("session: " + session + " full " + saj.getCsvScraper().getFileName() + "first " + first + " sub " + subName);
             return Integer.parseInt(subName);
         } else {
-            System.out.println("nope: " + saj.getCsvScraper().getFileName());
             return -1;
         }
     }
-
-
 }

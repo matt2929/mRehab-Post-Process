@@ -35,15 +35,10 @@ public class WO_Walk extends SensorWorkoutAbstract {
 					startRep = time;
 					startData = true;
 				}
-				zeroCrossCalculation.dataIn(data);
-				if (data[1] > threshold && data[2] > threshold) {
-
-				} else {
-
-				}
+				zeroCrossCalculation.dataIn(time,data);
 				if (time - startRep > walkLength) {
 					repCount++;
-					zeroCrossCalculation.endRep();
+					zeroCrossCalculation.endRep(time);
 					if (repCount == reps) {
 						workoutComplete = true;
 					} else {

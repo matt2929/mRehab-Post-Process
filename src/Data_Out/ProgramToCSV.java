@@ -22,7 +22,7 @@ public class ProgramToCSV {
     DataFilter dataFilter;
 
     public ProgramToCSV(String filename, Program program, DataFilter dataFilter) {
-
+        System.out.println("Start CSV Generation: "+ filename);
         try {
             File file = new File(filename.split("/")[0]);
             if(file.exists()){
@@ -42,7 +42,7 @@ public class ProgramToCSV {
         this.dataFilter = dataFilter;
         writeToFile(program, new LegendWriter(generateLegend()));
         closeFile();
-
+        System.out.println("End CSV Generation: "+ filename);
     }
 
     public void openFile(String filepath) {
@@ -74,6 +74,7 @@ public class ProgramToCSV {
         ArrayList<Legend> legends = new ArrayList<>();
         Legend hand = new Legend("Hand");
         hand.addPoint("0", "Left");
+        hand.addPoint("1", "Right");
         hand.addPoint("1", "Right");
 
         Legend user = new Legend("Activity");

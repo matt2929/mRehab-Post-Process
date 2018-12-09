@@ -22,10 +22,7 @@ public class LegendWriter {
         }
         if (legendSubIndex < legends.get(legendIndex).outputLegend().length -1) {
             return true;
-        } else if (legendIndex < legends.size()-1) {
-            return true;
-        }
-        return false;
+        } else return legendIndex < legends.size()-1;
     }
 
     public String[] next() {

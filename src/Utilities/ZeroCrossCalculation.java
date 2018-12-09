@@ -17,7 +17,7 @@ public class ZeroCrossCalculation {
 
 	}
 
-	public void dataIn(float[] f) {
+	public void dataIn(long time, float[] f) {
 		if (lastF != null) {
 			for (int i = 0; i < f.length; i++) {
 				f[i] = f[i] - lastF[i];
@@ -28,7 +28,7 @@ public class ZeroCrossCalculation {
 				}
 			}
 		} else {
-			startTime=System.currentTimeMillis();
+			startTime=time;
 			lastF = new float[f.length];
 		}
 		for (int i = 0; i < f.length; i++) {
@@ -36,8 +36,8 @@ public class ZeroCrossCalculation {
 		}
 	}
 
-	public void endRep() {
- 		times.add(Math.abs(startTime-System.currentTimeMillis()));
+	public void endRep(Long time) {
+ 		times.add(Math.abs(startTime-time));
 		zeroCrosses.add(zeroCross);
 		zeroCross = 0L;
 		lastF = null;

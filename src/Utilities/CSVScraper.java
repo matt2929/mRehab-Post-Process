@@ -86,6 +86,7 @@ public class CSVScraper {
                 } else if (str.contains("Workout")) {
                     WorkoutName = str.split(":")[1];
                 } else if (str.contains("Date HR")) {
+
                 } else if (str.contains("Date MS")) {
                     Date = Long.valueOf(str.split(":")[1]);
                 } else if (str.contains("Duration")) {
@@ -107,7 +108,7 @@ public class CSVScraper {
         if (WorkoutName != null) {
             for (String str : WorkoutData.SensorNames) {
                 if (str.equals(WorkoutName)) {
-                    sensor = true;
+                   sensor = true;
                 }
             }
         }

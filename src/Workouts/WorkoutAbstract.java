@@ -9,7 +9,6 @@ import Utilities.AverageValue;
 
 public abstract class WorkoutAbstract {
 	boolean workoutComplete = false;
-	Long lastActivity = System.currentTimeMillis();
 	WorkoutScore workoutScore;
 	boolean WorkoutInProgress = false;
 	float[] dataLast = null;
@@ -24,7 +23,6 @@ public abstract class WorkoutAbstract {
 
 	public void StartWorkout() {
 		WorkoutInProgress = true;
-		lastActivity = System.currentTimeMillis();
 	}
 
 	public boolean isWorkoutComplete() {

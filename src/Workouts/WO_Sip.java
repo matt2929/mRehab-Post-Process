@@ -30,7 +30,7 @@ public class WO_Sip extends SensorWorkoutAbstract {
 
 		if (WorkoutInProgress && !inCoolDown) {
 
-			zeroCrossCalculation.dataIn(data);
+			zeroCrossCalculation.dataIn(time,data);
 			if (data[1] > thresholdPickup && !pickedUp) {
 				pickedUp = true;
 				checkPoint = time;
@@ -44,7 +44,7 @@ public class WO_Sip extends SensorWorkoutAbstract {
 			}
 			if (timeDrank > timeToDrink) {
 				repCount++;
-				zeroCrossCalculation.endRep();
+				zeroCrossCalculation.endRep(time);
 				inCoolDown = true;
 				cooldownStart = time;
 				if (repCount == reps) {

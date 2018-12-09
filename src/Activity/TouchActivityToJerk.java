@@ -9,54 +9,35 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class TouchActivityToJerk {
+public class TouchActivityToJerk extends ActivityToJerkAbstract{
 
     private final int CHECK_CODE = 0x1;
     //~~~~~~~~~~~~~~~~~~~~~~~
-    Long TimeStartWorkout = System.currentTimeMillis();
-    Long TimeOfRep = System.currentTimeMillis();
-    //Workout Attributes~~~
-    String _WorkoutHand; //Which Hand
-    String _WorkoutName; //Name of Current Wokrout
-    Integer _WorkoutReps;//Number of Repetitions
     private TouchWorkoutAbstract _CurrentWorkout;
-    //Refrence ID for TTS~~~~
     private Boolean _WorkoutInProgress = false;
-    private ArrayList<Long> saveDurations = new ArrayList<>();
-    private WorkoutDescription _WorkoutDescription = null;
-    private CSVScraper csvScraper = new CSVScraper();
+    private CSVScraper csvScraper;
     long duration = 0;
-    HashMap<String, Double> averageErrors = new HashMap<>();
-    int total = 0;
-//There is an update from the Sensor
-
-
-    public boolean LoadCSV(File file) {
-        if (csvScraper.validateFile(file.getAbsolutePath()) && csvScraper.loadHeaderCSV()) {
-
-            return true;
-        } else {
-            return false;
-        }
+    public TouchActivityToJerk(CSVScraper csvScraper) {
+        this.csvScraper = csvScraper;
     }
-
+    @Override
     public CSVScraper getCsvScraper() {
         return csvScraper;
     }
-
+    @Override
     public void RunCSV() {
         SetupWorkout(csvScraper.getWorkoutName(), csvScraper.getReps());
         CSV_Line_Dissect_Abstract csv_line_dissect_abstract;
         startWorkoutSequence();
         while ((csv_line_dissect_abstract = csvScraper.readLine()) != null) {
             duration += csv_line_dissect_abstract.timeOut();
-            onTouchChanged(duration, csv_line_dissect_abstract.dataOut());
+            onSensorChanged(duration, csv_line_dissect_abstract.dataOut());
         }
         _CurrentWorkout.endWorkout();
 
     }
-
-    public void onTouchChanged(long time, float[] in) {
+    @Override
+    public void onSensorChanged(long time, float[] in) {
         if (_CurrentWorkout != null) {
             _CurrentWorkout.TouchIn(time, in[0],in[1]);
         }
@@ -66,7 +47,7 @@ public class TouchActivityToJerk {
         }
     }
 
-
+    @Override
     public void SetupWorkout(String WorkoutName, int reps) {
         if (WorkoutName.equals("Unlock With Key")) {
             _CurrentWorkout = new WO_Unlock(WorkoutName);
@@ -74,25 +55,19 @@ public class TouchActivityToJerk {
             _CurrentWorkout = new WO_Unlock(WorkoutName);
         }
     }
-
+    @Override
     public void endWorkoutSequence() {
         //do something when done
 
     }
-
+    @Override
     public void startWorkoutSequence() {
-        TimeStartWorkout = System.currentTimeMillis();
-        TimeOfRep = System.currentTimeMillis();
         _CurrentWorkout.StartWorkout();
         _WorkoutInProgress = true;
     }
-
+    @Override
     public WorkoutAbstract get_CurrentWorkout() {
         return _CurrentWorkout;
-    }
-
-    public static double error(double expected, double actual) {
-        return (Math.abs(expected - actual) / expected);
     }
 
 }

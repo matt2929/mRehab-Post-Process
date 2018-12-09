@@ -7,7 +7,6 @@ import Utilities.ZeroCrossCalculation;
  */
 
 public class WO_Twist extends SensorWorkoutAbstract {
-	Long Time = System.currentTimeMillis();
 	boolean down = false;
 	float lastValue = 0;
 	int count = 0;
@@ -16,7 +15,6 @@ public class WO_Twist extends SensorWorkoutAbstract {
 
 	public WO_Twist(String Name) {
 		super.SensorWorkout(Name);
-		Time = 0l;
 		zeroCrossCalculation = new ZeroCrossCalculation();
 	}
 
@@ -26,10 +24,10 @@ public class WO_Twist extends SensorWorkoutAbstract {
 	public void SensorDataIn(long time, float[] data) {
 		super.SensorDataIn(time, data);
 		if (WorkoutInProgress) {
-			zeroCrossCalculation.dataIn(data);
+			zeroCrossCalculation.dataIn(time,data);
 			if (AverageDataValue[1] < threshold && lastValue >= threshold) {
 				count++;
-				zeroCrossCalculation.endRep();
+				zeroCrossCalculation.endRep(time);
 				if (count == reps) {
 					workoutComplete = true;
 				}

@@ -48,7 +48,7 @@ public class WO_Pour extends SensorWorkoutAbstract {
 				filledPercentage -= removalRate;
 				if (filledPercentage < emptyThreshold) {
 					repCount++;
-					zeroCrossCalculation.endRep();
+					zeroCrossCalculation.endRep(time);
 					if (repCount == reps) {
 						workoutComplete = true;
 					} else {
@@ -60,7 +60,7 @@ public class WO_Pour extends SensorWorkoutAbstract {
 			} else {
 
 			}
-			zeroCrossCalculation.dataIn(new float[]{Angle});
+			zeroCrossCalculation.dataIn(time,new float[]{Angle});
 		} else if (inCooldown) {
 			if (Math.abs(time - startOfCooldown) >= coolDownDuration) {
 				inCooldown = false;

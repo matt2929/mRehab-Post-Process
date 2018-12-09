@@ -2,7 +2,7 @@ package Utilities;
 
 public class CSV_Line_Dissect_Touch extends CSV_Line_Dissect_Abstract {
 
-    private long time = 0l;
+    private double time = 0l;
     private float sensorAxis[] = new float[4];
 
 
@@ -13,13 +13,13 @@ public class CSV_Line_Dissect_Touch extends CSV_Line_Dissect_Abstract {
             sensorAxis[i - 1] = Float.parseFloat(line[i]);
         }
         //System.out.println(line[0]);
-        time = (long) Double.parseDouble(line[0]);
+        time =  Double.parseDouble(line[0]);
         // System.out.println(time);
     }
 
 
     @Override
-    public long timeOut() {
+    public double timeOut() {
         return time;
     }
 

@@ -11,7 +11,7 @@ public abstract class CSV_Line_Dissect_Abstract {
         return null;
     }
 
-    public long timeOut(){
+    public double timeOut(){
         return -1l;
     }
 

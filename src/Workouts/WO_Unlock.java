@@ -22,28 +22,28 @@ public class WO_Unlock extends TouchWorkoutAbstract {
     }
 
     @Override
-    public boolean TouchIn(long Time, float x, float y) {
+    public boolean TouchIn(long time, float x, float y) {
         if (WorkoutInProgress) {
            double angle = Math.atan((y / x));
-            zeroCrossCalculation.dataIn(new float[]{(float) angle});
+            zeroCrossCalculation.dataIn(time,new float[]{(float) angle});
             float margin = (200f);
             if (left) {
                 if (x < margin) {
-                    completeTurn();
+                    completeTurn(time);
                 }
             } else {
                 if (x > (width - margin)) {
-                    completeTurn();
+                    completeTurn(time);
                 }
             }
            }
         return true;
     }
 
-    public void completeTurn() {
+    public void completeTurn(long time) {
 
         countReps++;
-        zeroCrossCalculation.endRep();
+        zeroCrossCalculation.endRep(time);
         if (countReps == reps) {
             workoutComplete = true;
         } else {
